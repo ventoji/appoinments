@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "test": "jest --watchAll"
+    "test": "jest test/AppointmentForm.test.js --verbose --watchAll"
   },
   "keywords": [],
   "author": "",
