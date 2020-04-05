@@ -1,19 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
+import { createContainer, withEvent } from './domManipulators';
 import { 
     Appointment,
     AppointmentsDayView
 } from '../src/AppointmentDaysView';
 
 describe('Appointment', () => {
-    let container;
+    let container, render;
     let customer;
 
     beforeEach(() => {
-        container = document.createElement('div');
+     //   container = document.createElement('div');
+        ({ container,
+          render
+        } = createContainer());
       });
-    const render = component => ReactDOM.render(component, container);
+   // const render = component => ReactDOM.render(component, container);
 
     it('renders the customer first name', () => {
         customer = { firstName: 'Ashley' };
@@ -29,14 +33,18 @@ describe('Appointment', () => {
 });
 
 describe('AppointmentsDayView', () => {
-    let container;
+    let container, render, click;
   
     beforeEach(() => {
-      container = document.createElement('div');
-    });
+     // container = document.createElement('div');
+      ({ container,
+        render,
+        click
+      } = createContainer());
+    }); 
   
-    const render = component =>
-      ReactDOM.render(component, container);
+  /*  const render = component =>
+      ReactDOM.render(component, container);*/
     const today = new Date();
     const appointments = [
         { 
@@ -98,7 +106,8 @@ describe('AppointmentsDayView', () => {
       it('renders another appointment when selected', () => {
         render(<AppointmentsDayView appointments={appointments} />);
         const button = container.querySelectorAll('button')[1];
-        ReactTestUtils.Simulate.click(button);
+       // ReactTestUtils.Simulate.click(button);
+        click(button);
         expect(container.textContent).toMatch('Jordan');
       });
   });

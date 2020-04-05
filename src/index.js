@@ -6,8 +6,8 @@ import { sampleAppointments } from './sampleData';
 import { CustomerForm } from './CustomerForm';
 import { AppointmentForm } from './AppointmentForm';
 //const jx = <AppointmentsDayView appointments={sampleAppointments} />;
-//const jx = <AppointmentForm  />; 
-const jx = <CustomerForm />;
+const jx = <AppointmentForm  />; 
+//const jx = <CustomerForm />;
 
 ReactDOM.render(
   jx,

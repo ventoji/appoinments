@@ -9,7 +9,8 @@ const mergeDateAndTime = (date, timeSlot) => {
       time.getMilliseconds()
     );
   };
-const timeIncrements = (numTimes, startTime, increment) =>
+
+  const timeIncrements = (numTimes, startTime, increment) =>
   Array(numTimes)
     .fill([startTime])
     .reduce((acc, _, i) =>
@@ -105,12 +106,13 @@ const RadioButtonIfAvailable = ({
             availableTimeSlot.startsAt === startsAt
           )
         ) {
+          const isChecked = startsAt === checkedTimeSlot;
           return (
             <input
               name="startsAt"
               type="radio"
-              value={startsAt}
               checked={isChecked}
+              value={startsAt}
               onChange={handleChange}
             />);
         }
@@ -119,16 +121,20 @@ const RadioButtonIfAvailable = ({
 export const AppointmentForm = ({
     selectableServices,
     service,
-    onSubmit,
     salonOpensAt,
     salonClosesAt,
     today,
     availableTimeSlots
 }) => {
-    const [selectedService, setSelectedService] = useState(service);
+    const [appointment, setAppointment] = useState({
+      service: service,
+      startAt: 0
+    });
 
     const handleChange = (e) => {
-        setSelectedService(e.target.value);
+        setAppointment({
+          ...appointment,
+          service: e.target.value});
         console.log(e.target.value);
     }
     const handleStartsAtChange = useCallback(
@@ -139,8 +145,24 @@ export const AppointmentForm = ({
           })),
         []
       );
+    const handleSubmit = async e => {
+        e.preventDefault();
+       // onSubmit(customer);
+       const result = await window.fetch('/appointments', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (result.ok) {
+          //  const customerWithId = await result.json();
+           
+        }else{
+            setError(true);
+        }
+      };
+
     return(
-    <form id="appointment" onSubmit={() => onSubmit(appointment)}  >
+    <form id="appointment" onSubmit={handleSubmit}  >
     <label htmlFor="service"> Salon service </label>
         <select 
             id="service"
