@@ -7,5 +7,10 @@ module.exports = {
    rules: [{
      test: /\.(js|jsx)$/,
      exclude: /node_modules/,
-     loader: 'babel-loader'}]}
+     loader: 'babel-loader'}]
+    },
+  devServer: {
+      contentBase: path.join(__dirname,'dist'),
+      historyApiFallback: true
+  },
 };
