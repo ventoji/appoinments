@@ -19,6 +19,7 @@ describe('AppointmentForm', () => {
       field,
       change,
       submit;
+ const customer = { id: 123 };
   
   const timeSlotTable = () =>
       container.querySelector('table#time-slots');
@@ -33,6 +34,11 @@ describe('AppointmentForm', () => {
           option => option.textContent === textContent
         );
       };
+  const today = new Date();
+  const availableTimeSlots = [
+        { startsAt: today.setHours(9, 0, 0, 0) },
+        { startsAt: today.setHours(9, 30, 0, 0) }
+      ];
 
   beforeEach(() => {
     ({ 
@@ -87,8 +93,6 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
       expect(firstNode.value).toEqual('');
       expect(firstNode.selected).toBeTruthy();
     });
-
-    
     it('lists all salon services', () => {
       const selectableServices = [
         'Cut',
@@ -114,8 +118,7 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
           expect.arrayContaining(selectableServices)
         );
       }) 
-
-      it('pre-selects the existing value', () => {
+    it('pre-selects the existing value', () => {
         const services = ['Cut', 'Blow-dry'];
         render(
           <AppointmentForm
@@ -129,10 +132,9 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
         );
         expect(option.selected).toBeTruthy();
       });
-  
-      itRendersALabel('service', ' Salon service '); 
-      itAssignsAnIdThatMatchesTheLabelId('service');
-      it('save existing values when submit', async () => {
+    itRendersALabel('service', ' Salon service '); 
+    itAssignsAnIdThatMatchesTheLabelId('service');
+    it('save existing values when submit', async () => {
 
         render(<AppointmentForm 
            service="Cut"
@@ -145,7 +147,8 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
       
        });
 
-      describe('time slot table', () => {
+    describe('time slot table', () => {
+
         it('renders a table for time slots', () => {
           render(<AppointmentForm />);
           expect(timeSlotTable()).not.toBeNull();
@@ -203,7 +206,10 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
         });
 
         it('does not render radio buttons for unavailable time slots', () => {
-          render(<AppointmentForm availableTimeSlots={[]} />);
+          render(<AppointmentForm 
+            availableTimeSlots={[]} 
+            customer={customer}
+            />);
           const timesOfDay = timeSlotTable().querySelectorAll(
             'input'
           );
@@ -220,6 +226,7 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
             <AppointmentForm
               availableTimeSlots={availableTimeSlots}
               today={today}
+              customer={customer}
             />);
           expect(startsAtField(0).value).toEqual(
             availableTimeSlots[0].startsAt.toString()
@@ -229,24 +236,36 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
           );
         });
 
-        it('saves new value when submitted', () => {
-        //  expect.hasAssertions();
-          const today = new Date();
-          const availableTimeSlots = [
-            { startsAt: today.setHours(9, 0, 0, 0) },
-            { startsAt: today.setHours(9, 30, 0, 0) }
-          ];
+        it('saves existing value when submitted', async () => {
           render(
             <AppointmentForm
+              customer={customer}
               availableTimeSlots={availableTimeSlots}
               today={today}
               startsAt={availableTimeSlots[0].startsAt}
             />
           );
-         change(
+          await submit(form('appointment'));
+        
+          expect(fetchResponseOk(window.fetch)).toMatchObject({
+            startsAt: availableTimeSlots[0].startsAt
+          });
+        });
+
+        it('saves new value when submitted', () => {
+        //  expect.hasAssertions();    
+          render(
+            <AppointmentForm
+              customer={customer}
+              availableTimeSlots={availableTimeSlots}
+              today={today}
+              startsAt={availableTimeSlots[0].startsAt}
+            />
+          );
+    /*     change(
           field('appointment','startAt' ), //field(fieldName),
           withEvent('startAt', availableTimeSlots[1].startsAt.toString())
-         )
+         )*/
         /*  ReactTestUtils.Simulate.change(startsAtField(1), {
             target: {
               value: availableTimeSlots[1].startsAt.toString(),
@@ -256,6 +275,15 @@ const  itAssignsAnIdThatMatchesTheLabelId = (fieldName) =>
           submit('appointment')
          // ReactTestUtils.Simulate.submit(form('appointment'));
         });
+
+        it('passes the customer id to fetch when submitting', async () => {
+       
+            render(<AppointmentForm customer={customer} />);
+            await submit(form('appointment'));
+            expect(fetchResponseOk(window.fetch)).toMatchObject({
+              customer: customer.id
+            });
+          });
       
       });
   });

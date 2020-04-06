@@ -119,6 +119,7 @@ const RadioButtonIfAvailable = ({
         return null;
       };      
 export const AppointmentForm = ({
+    customer,
     selectableServices,
     service,
     salonOpensAt,
@@ -151,7 +152,11 @@ export const AppointmentForm = ({
        const result = await window.fetch('/appointments', {
           method: 'POST',
           credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...appointment,
+            customer: customer.id
+          })
         });
         if (result.ok) {
           //  const customerWithId = await result.json();

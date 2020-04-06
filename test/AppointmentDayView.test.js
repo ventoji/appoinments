@@ -5,7 +5,7 @@ import { createContainer, withEvent } from './domManipulators';
 import { 
     Appointment,
     AppointmentsDayView
-} from '../src/AppointmentDaysView';
+} from '../src/AppointmentsDayView';
 
 describe('Appointment', () => {
     let container, render;

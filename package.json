@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "dev-server": "webpack-dev-server",
-    "test": "jest test/AppointmentFormLoader.test.js --verbose --watchAll"
+    "test": "jest test/AppointmentForm.test.js --verbose --watchAll"
   },
   "keywords": [],
   "author": "",
