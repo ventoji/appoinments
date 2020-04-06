@@ -35,7 +35,12 @@ const simulateEventAndWait = eventName => async (
   );
 
   return {
-    render: component => ReactDOM.render(component, container),
+    render: component =>
+    act(() => {
+      ReactDOM.render(component, container);
+    }),
+    renderAndWait: async component =>
+      await act(async () => ReactDOM.render(component, container)), 
     container,
     element,
     form,
