@@ -8,6 +8,8 @@ export const className = className => element =>
 
 export const click = element => element.props.onClick();
 
+export const type = typeName => element => element.type === typeName;
+
 export const childrenOf = element => {
     if (typeof element === 'string') {
       return [];

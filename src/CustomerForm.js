@@ -3,7 +3,19 @@ import React,  { useState }  from 'react';
 const Error = () => (
     <div className="error">An error occurred during save.</div>
   );
-  
+
+const required = description => value =>
+  !value || value.trim() === ''
+    ? description
+    : undefined;
+
+const match = (re, description) => value =>
+    !value.match(re) ? description : undefined;
+const list = (...validators) => value =>
+    validators.reduce(
+      (result, validator) => result || validator(value),
+      undefined
+    );
 export const CustomerForm = ({ 
     firstName, 
     lastName,
@@ -16,12 +28,46 @@ export const CustomerForm = ({
         lastName,
         phoneNumber
     });
+    const [validationErrors, setValidationErrors] = useState({});
     const [error, setError] = useState(false);
+    
     const handleChangeField = ({ target }) =>
     setCustomer(customer => ({
     ...customer,
     [target.name]: target.value
   }));
+
+const hasError = (fieldName) =>
+  validationErrors[fieldName] !== undefined;
+
+const renderError = (fieldName) => {
+  if (hasError(fieldName)) {
+    return (
+      <span className="error">
+       {validationErrors[fieldName]}
+      </span>
+    );
+  }
+};
+
+  const handleBlur = ({ target }) => {
+    const validators = {
+        firstName: required('First name is required'),
+        lastName: required('Last name is required'),
+        phoneNumber: list(
+            required('Phone number is required'),
+            match(
+              /^[0-9+()\- ]*$/,
+              'Only numbers, spaces and these symbols are allowed: ( ) + -'
+            )
+          )
+         };
+    const result = validators[target.name](target.value);
+    setValidationErrors({
+      ...validationErrors,
+      [target.name]: result
+    });
+  };
 
 
   const handleSubmit = async e => {
@@ -51,7 +97,9 @@ export const CustomerForm = ({
                 name="firstName"
                 value={firstName}
                 onChange={handleChangeField}
-            />
+                onBlur={handleBlur}
+                />
+                {renderError('firstName')}
             <label htmlFor="lastName">Last name</label>
             <input
                 id="lastName"
@@ -59,7 +107,9 @@ export const CustomerForm = ({
                 name="lastName"
                 value={lastName}
                 onChange={handleChangeField}
-            />
+                onBlur={handleBlur}
+                />
+                {renderError('lastName')}
 
             <label htmlFor="phoneNumber">Phone number</label>
             <input
@@ -68,7 +118,9 @@ export const CustomerForm = ({
                 name="phoneNumber"
                 value={phoneNumber}
                 onChange={handleChangeField}
-            />
+                onBlur={handleBlur}
+                />
+                {renderError('phoneNumber')}
 
         <input type="submit" value="Add" />
            </form> 

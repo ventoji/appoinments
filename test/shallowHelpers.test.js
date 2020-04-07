@@ -2,7 +2,7 @@ import React from 'react';
 import { 
     childrenOf,
     createShallowRenderer 
-} from '../src/shallowHelpers';
+} from './shallowHelpers';
 
 describe('childrenOf', () => {
   it('returns no children', () => {

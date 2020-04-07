@@ -49,6 +49,7 @@ const simulateEventAndWait = eventName => async (
     elements,
     click: simulateEvent('click'),
     change: simulateEvent('change'),
-    submit: simulateEventAndWait('submit')
+    submit: simulateEventAndWait('submit'),
+    blur: simulateEvent('blur')
   };
 };

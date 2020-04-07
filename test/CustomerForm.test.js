@@ -10,7 +10,7 @@ import {
  } from './spyHelpers';
 
 describe('CustomerForm', () => {
-  let render, element,form, field, labelFor, change, submit;
+  let render, element,form, blur, field, labelFor, change, submit;
  // let fetchSpy;
 
   beforeEach(() => {
@@ -20,7 +20,8 @@ describe('CustomerForm', () => {
       field,
       labelFor,
       change,
-      submit
+      submit,
+      blur
     } = createContainer());
   //  fetchSpy = jest.fn(() => fetchResponseOk({}));
    // window.fetch = fetchSpy;
@@ -275,5 +276,53 @@ describe('CustomerForm', () => {
     expect(errorElement).not.toBeNull();
     expect(errorElement.textContent).toMatch('error occurred');
   });
+
+  describe('validation form', () => {
+
+    const itInvalidatesFieldWithValue = (
+      fieldName,
+      value,
+      description
+    ) => {
+      it(`displays error after blur when ${fieldName} field is '${value}'`, () => {
+        render(<CustomerForm />);
+    
+        blur(
+          field('customer', fieldName),
+          withEvent(fieldName, value)
+        );
+    
+        expect(element('.error')).not.toBeNull();
+        expect(element('.error').textContent).toMatch(
+          description
+        );
+      });
+    }
+
+    itInvalidatesFieldWithValue('firstName','','First name is required');
+    itInvalidatesFieldWithValue('lastName','','Last name is required');
+    itInvalidatesFieldWithValue(
+      'phoneNumber',
+      ' ',
+      'Phone number is required'
+    );
+    itInvalidatesFieldWithValue(
+      'phoneNumber',
+      'invalid',
+      'Only numbers, spaces and these symbols are allowed: ( ) + -'
+    );
+
+    it('accepts standard phone number characters when validating', () => {
+      render(<CustomerForm />);
+    
+      blur(
+        element("[name='phoneNumber']"),
+        withEvent('phoneNumber', '0123456789+()- ')
+      );
+    
+      expect(element('.error')).toBeNull();
+    });
+  })
+
 });
 
