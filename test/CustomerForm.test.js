@@ -1,7 +1,8 @@
 import React from 'react';
 import { createContainer, withEvent } from './domManipulators';
 import { CustomerForm } from '../src/CustomerForm';
-import  { act } from 'react-dom/test-utils';
+//import  { act } from 'react-dom/test-utils';
+import ReactTestUtils, { act } from 'react-dom/test-utils';
 import 'whatwg-fetch';
 import { 
   fetchResponseOk, 
@@ -12,6 +13,11 @@ import {
 describe('CustomerForm', () => {
   let render, element,form, blur, field, labelFor, change, submit;
  // let fetchSpy;
+ const validCustomer = {
+  firstName: 'first',
+  lastName: 'last',
+  phoneNumber: '123456789'
+};
 
   beforeEach(() => {
     ({ render, 
@@ -48,34 +54,6 @@ describe('CustomerForm', () => {
     expect(formElement.type).toEqual('text');
   };
 
-/*   
-  const spy = () => {
-    let receivedArguments;
-    let returnValue;
-    return {
-      fn: (...args) => {
-        receivedArguments = args
-        return returnValue;
-      },
-     mockReturnValue: value => returnValue = value,
-     receivedArguments: () => receivedArguments,
-     receivedArgument: n => receivedArguments[n]
-    };
-  }; */
-
-/*   expect.extend({
-    toHaveBeenCalled(received) {
-      if (received.receivedArguments() === undefined) {
-        return {
-          pass: false,
-          message: () => 'Spy was not called.'
-        };
-      }
-      return { pass: true, message: () => 'Spy was called.' };
-    }
-  }); */
-
-
 
   const itRendersAsATextBox = (fieldName) =>
     it('renders as a text box', () => {
@@ -103,8 +81,10 @@ describe('CustomerForm', () => {
   it('saves existing value when submitted', async () => {
     //const fetchSpy = spy();
 
+    //render(<CustomerForm {...validCustomer} />);
     render(
       <CustomerForm
+        {...validCustomer}
         {...{ [fieldName]: 'value' }}
       />
     );
@@ -128,6 +108,7 @@ describe('CustomerForm', () => {
 
     render(
       <CustomerForm
+       {...validCustomer}
         {...{ [fieldName]: 'existingValue' }}
       />
     );
@@ -184,7 +165,7 @@ describe('CustomerForm', () => {
   });
   
   it('has a submit button', () => {
-    render(<CustomerForm />);
+    render(<CustomerForm  {...validCustomer}/>);
     const submitButton = element(
       'input[type="submit"]'
     );
@@ -193,7 +174,9 @@ describe('CustomerForm', () => {
   it('calls fetch with the right properties when submitting data', async () => {
   //  const fetchSpy = spy(); fetch={fetchSpy.fn}
     render(
-      <CustomerForm  onSubmit={() => {}} />
+      <CustomerForm  
+      {...validCustomer}
+     />
     );
     submit(form('customer'));
    // ReactTestUtils.Simulate.submit(form('customer'));
@@ -221,7 +204,10 @@ describe('CustomerForm', () => {
     window.fetch.mockReturnValue(fetchResponseOk(customer));
     const saveSpy = jest.fn(); //spy();
   
-    render(<CustomerForm onSave={saveSpy} />);
+    render(<CustomerForm 
+      {...validCustomer}
+        onSave={saveSpy} 
+        />);
     await act(async () => {
       submit(form('customer'));
      // ReactTestUtils.Simulate.submit(form('customer'));
@@ -236,7 +222,10 @@ describe('CustomerForm', () => {
      window.fetch.mockReturnValue(fetchResponseError());
     const saveSpy = jest.fn(); // spy();
   
-    render(<CustomerForm onSave={saveSpy} />);
+    render(<CustomerForm 
+      {...validCustomer}
+      onSave={saveSpy} 
+      />);
     await act(async () => {
       submit(form('customer'));
      // ReactTestUtils.Simulate.submit(form('customer'));
@@ -248,7 +237,7 @@ describe('CustomerForm', () => {
   it('prevents the default action when submitting the form', async () => {
     const preventDefaultSpy = jest.fn(); // spy();
   
-    render(<CustomerForm />);
+    render(<CustomerForm  {...validCustomer}/>);
     await act(async () => {
       submit(form('customer'),{
         preventDefault: preventDefaultSpy
@@ -266,7 +255,7 @@ describe('CustomerForm', () => {
   it('renders error message when fetch call fails', async () => {
      window.fetch.mockReturnValue(Promise.resolve({ ok: false }));
   
-    render(<CustomerForm />);
+    render(<CustomerForm {...validCustomer}/>);
     await act(async () => {
       submit(form('customer'));
     //  ReactTestUtils.Simulate.submit(form('customer'));
@@ -322,6 +311,55 @@ describe('CustomerForm', () => {
     
       expect(element('.error')).toBeNull();
     });
+
+    it('does not submit the form when there are validation errors', async () => {
+      render(<CustomerForm />);
+    
+      await submit(form('customer'));
+      expect(window.fetch).not.toHaveBeenCalled();
+    });
+    it('renders validation errors after submission fails', async () => {
+      render(<CustomerForm />);
+      await submit(form('customer'));
+      expect(window.fetch).not.toHaveBeenCalled();
+      expect(element('.error')).not.toBeNull();
+    });
+
+    it('renders field validation errors from server', async () => {
+      const errors = {
+        phoneNumber: 'Phone number already exists in the system'
+      };
+      window.fetch.mockReturnValue(
+        fetchResponseError(422, { errors })
+      );
+      render(<CustomerForm {...validCustomer} />);
+      await submit(form('customer'));
+      expect(element('.error').textContent).toMatch(
+        errors.phoneNumber
+      );
+    });
+
+    it('displays indicator when form is submitting', async () => {
+      render(<CustomerForm {...validCustomer} />);
+      act(() => {
+        ReactTestUtils.Simulate.submit(form('customer'));
+      });
+      await act(async() => {
+        expect(element('span.submittingIndicator')).not.toBeNull();
+      });
+    });
+    
+    it('initially does not display the submitting indicator', () => {
+      render(<CustomerForm {...validCustomer} />);
+      expect(element('.submittingIndicator')).toBeNull();
+    });
+
+    it('hides indicator when form has submitted', async () => {
+      render(<CustomerForm {...validCustomer} />);
+      await submit(form('customer'));
+      expect(element('.submittingIndicator')).toBeNull();
+    });
+
   })
 
 });
