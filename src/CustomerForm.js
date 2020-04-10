@@ -1,4 +1,5 @@
 import React,  { useState }  from 'react';
+import { connect } from 'react-redux';
 import { 
     required, 
     match, 
@@ -11,12 +12,36 @@ import {
 const Error = () => (
     <div className="error">An error occurred during save.</div>
   );
+  //const mapStateToProps = () => ({});
+  const mapStateToProps = ({ customer: {
+    validationErrors, 
+    error,
+    status 
+  } }) => 
+  ({ 
+    error,
+    serverValidationErrors: validationErrors,
+    status 
+  });
+  const mapDispatchToProps = {
+    addCustomerRequest: customer => ({
+      type: 'ADD_CUSTOMER_REQUEST',
+      customer
+    })
+  };
 
-export const CustomerForm = ({ 
+export const CustomerForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(({ 
     firstName, 
     lastName,
     phoneNumber,
-    onSave
+    onSave,
+    addCustomerRequest,
+    error,
+    serverValidationErrors,
+    status
 }) => {
     //const customer = { firstName };
     const [customer, setCustomer] = useState({
@@ -25,20 +50,31 @@ export const CustomerForm = ({
         phoneNumber
     });
     const [validationErrors, setValidationErrors] = useState({});
-    const [error, setError] = useState(false);
-    const [submitting, setSubmitting]=useState(false);
-    const handleChangeField = ({ target }) =>
+   // const [error, setError] = useState(false);
+    //const [submitting, setSubmitting]=useState(false);
+    const submitting = status === 'SUBMITTING';
+    const handleChangeField = ({ target }) =>{
     setCustomer(customer => ({
     ...customer,
     [target.name]: target.value
   }));
+    const result = validateMany(validators, {
+    [target.name] : target.value
+  });
+    setValidationErrors({ ...validationErrors, ...result});
 
+};
 
     const renderError = (fieldName) => {
-  if (hasError( validationErrors,fieldName)) {
+      const allValidationErrors = {
+        ...validationErrors,
+        ...serverValidationErrors
+      };
+  if (hasError( allValidationErrors,fieldName)) {
     return (
       <span className="error">
-       {validationErrors[fieldName]}
+      {allValidationErrors[fieldName]}
+       {/*validationErrors[fieldName]*/}
       </span>
     );
   }
@@ -70,32 +106,35 @@ export const CustomerForm = ({
     });
     setValidationErrors({ ...validationErrors, ...result});
   }
-
-
-  const handleSubmit = async e => {
+/*  const doSave = async () => {
+ // setSubmitting(true);
+  const result = await window.fetch('/customers', {
+     method: 'POST',
+     credentials: 'same-origin',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify(customer)
+   });
+  // setSubmitting(false);
+   if (result.ok) {
+       const customerWithId = await result.json();
+       onSave(customerWithId);
+   }else if (result.status === 422) {
+     const response = await result.json();
+     setValidationErrors(response.errors);
+   }
+  // else{
+  //      setError(true);
+  //  }
+};  */
+ 
+  const handleSubmit =  e => {
     e.preventDefault();
    // onSubmit(customer);
    const validationResult = validateMany(validators,customer);
     if (!anyErrors(validationResult)) {
     // console.log('entra');
-    setSubmitting(true);
-     const result = await window.fetch('/customers', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(customer)
-      });
-      setSubmitting(false);
-      if (result.ok) {
-          const customerWithId = await result.json();
-          onSave(customerWithId);
-      }else if (result.status === 422) {
-        const response = await result.json();
-        setValidationErrors(response.errors);
-      }
-     else{
-          setError(true);
-      }
+   // await  doSave();
+    addCustomerRequest(customer);
    }else{
     setValidationErrors(validationResult);
    } 
@@ -139,16 +178,17 @@ export const CustomerForm = ({
                 />
                 {renderError('phoneNumber')}
 
-        <input type="submit" value="Add" />
+        <input type="submit" value="Add"  {...submitting ? 'disabled' : null} />
         { submitting ? <span className="submittingIndicator" /> : null }
            </form> 
         </div>
     );
-};
+});
 
-CustomerForm.defaultProps = {
+/* CustomerForm.defaultProps = {
     onSave: () => {}
-  };
+  }; */
 /* CustomerForm.defaultProps = {
     fetch: async () => {}
   }; */
+

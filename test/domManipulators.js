@@ -1,6 +1,9 @@
 import ReactDOM from 'react-dom';
+import React from 'react';
 import ReactTestUtils, { act } from 'react-dom/test-utils';
-
+import { Provider } from 'react-redux';
+import { storeSpy } from 'expect-redux';
+import { configureStore } from '../src/store';
 
 export const withEvent = (name, value) => ({
   target: { name, value }
@@ -21,7 +24,7 @@ export const createContainer = () => {
       container.querySelector(selector);
   
   const elements = selector =>
-  Array.from(container.querySelectorAll);
+  Array.from(container.querySelectorAll(selector));
 
   const simulateEvent = eventName => (element, eventData) =>
   ReactTestUtils.Simulate[eventName](element, eventData);
@@ -48,8 +51,28 @@ const simulateEventAndWait = eventName => async (
     labelFor,
     elements,
     click: simulateEvent('click'),
+    clickAndWait: simulateEventAndWait('click'),
     change: simulateEvent('change'),
+    changeAndWait: simulateEventAndWait('change'),
     submit: simulateEventAndWait('submit'),
     blur: simulateEvent('blur')
+  };
+};
+
+export const createContainerWithStore = () => {
+  const store = configureStore([storeSpy]);
+
+  const container = createContainer();
+  return {
+    ...container,
+    store,
+    renderWithStore: component => {
+      act(() => {
+        ReactDOM.render(
+          <Provider store={store}>{component}</Provider>,
+          container.container
+        );
+      });
+    }
   };
 };

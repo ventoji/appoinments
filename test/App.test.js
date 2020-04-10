@@ -70,7 +70,6 @@ describe('App', () => {
 it('displays the AppointmentFormLoader after the CustomerForm is submitted', async () => {
   beginAddingCustomerAndAppointment();
   saveCustomer();
-
   expect(
     elementMatching(type(AppointmentFormLoader))
   ).toBeDefined();
@@ -101,4 +100,37 @@ it('renders AppointmentDayViewLoader after AppointmentForm is submitted', async 
     elementMatching(type(AppointmentsDayViewLoader))
   ).toBeDefined();
 });
+
+const renderSearchActionsForCustomer = customer => {
+  searchCustomers();
+  const customerSearch = elementMatching(type(CustomerSearch));
+  const searchActionsComponent =
+    customerSearch.props.renderCustomerActions;
+  return searchActionsComponent(customer);
+};
+
+it('passes a button to the CustomerSearch named Create appointment', async () => {
+  const button = childrenOf(
+    renderSearchActionsForCustomer()
+  )[0];
+  expect(button).toBeDefined();
+  expect(button.type).toEqual('button');
+  expect(button.props.role).toEqual('button');
+  expect(button.props.children).toEqual('Create appointment');
+});
+
+it('clicking appointment button shows the appointment form for that customer', async () => {
+  const customer = { id: 123 };
+  const button = childrenOf(
+    renderSearchActionsForCustomer(customer)
+  )[0];
+  click(button);
+  expect(
+    elementMatching(type(AppointmentFormLoader))
+  ).not.toBeNull();
+  expect(
+    elementMatching(type(AppointmentFormLoader)).props.customer
+  ).toBe(customer);
+});
+
 });

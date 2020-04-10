@@ -1,11 +1,9 @@
 import React, {useState, useCallback} from 'react';
-//import ReactDOM from 'react-dom';
-//import { AppointmentsDayViewLoader } from './AppointmentsDayViewLoader';
+import ReactDOM from 'react-dom';
+import { AppointmentsDayViewLoader } from './AppointmentsDayViewLoader';
 import { CustomerForm } from './CustomerForm';
 import { AppointmentFormLoader } from './AppointmentFormLoader';
-import { CustomerSearch } from './CustomerSearch';
-import { MainScreen } from './MainScreen';
-import {Switch, Route } from 'react-router-dom';
+import { CustomerSearch } from './CustomerSearch'
 
 const searchActions = customer => (
   <React.Fragment>
@@ -34,13 +32,11 @@ export const App = () => {
       }, []);
 
     const transitionToDayView = useCallback(
-      () => history.push('/'),
-      [history]
-   //     () => setView('dayView'),
-    //    []
+        () => setView('dayView'),
+        []
       );
 
-/*       switch (view) {
+      switch (view) {
         case 'addCustomer':
           return (
             <CustomerForm onSave={transitionToAddAppointment}/>
@@ -56,25 +52,8 @@ export const App = () => {
             return (
               <CustomerSearch renderCustomerActions={searchActions} />
             );
-        default: */
-
+        default:
           return (
-            <Switch>
-              <Route path="/addCustomer" render={()=>(
-                <CustomerForm onSave={transitionToAddAppointment}/>
-              )} />
-              <Route path="/addAppointment"  render={() => (
-                <AppointmentFormLoader
-                  customer={customer}
-                  onSave={transitionToDayView} />
-              )} />
-              <Route path="/searchCustomers" render={()=>(
-                <CustomerSearch  renderCustomerActions={searchActions}/>)
-              } />
-              <Route component={MainScreen} />
-            </Switch>
-          );
-/*           return (
             <React.Fragment>
               <div className="button-bar">
                 <button
@@ -86,7 +65,7 @@ export const App = () => {
               </div>
               <AppointmentsDayViewLoader today={today} />
             </React.Fragment>
-          ); */
-    //  }
+          );
+      }
 
 };

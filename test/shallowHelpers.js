@@ -49,10 +49,11 @@ export const childrenOf = element => {
 
     return {
       render: component => renderer.render(component),
+      root: () => renderer.getRenderOutput(),
       elementMatching: matcherFn =>
-      elementsMatching(renderer.getRenderOutput(), matcherFn)[0],
+        elementsMatching(renderer.getRenderOutput(), matcherFn)[0],
       elementsMatching: matcherFn =>
-      elementsMatching(renderer.getRenderOutput(), matcherFn),
+        elementsMatching(renderer.getRenderOutput(), matcherFn),
       child: n => childrenOf(renderer.getRenderOutput())[n],
     };
   };
