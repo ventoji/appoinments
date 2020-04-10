@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "dev-server": "webpack-dev-server",
-    "test": "jest test/CustomerForm.test.js --verbose --watchAll"
+    "test": "jest test/App.test.js --verbose --watchAll"
   },
   "keywords": [],
   "author": "",

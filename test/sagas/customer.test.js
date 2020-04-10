@@ -6,7 +6,7 @@ import {
     fetchResponseOk,
     fetchResponseError
    } from '../spyHelpers';
-   import { 
+import { 
        itMaintainsExistingState,
        itSetsStatus  
     } from '../reducerGenerators';

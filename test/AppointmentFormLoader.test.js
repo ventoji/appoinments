@@ -20,14 +20,15 @@ describe('AppointmentFormLoader', () => {
     jest
       .spyOn(window, 'fetch')
       .mockReturnValue(fetchResponseOk(availableTimeSlots));
-    jest
+      AppointmentFormExports.AppointmentForm = jest.fn(() => null);
+   /*  jest
       .spyOn(AppointmentFormExports, 'AppointmentForm')
-      .mockReturnValue(null);
+      .mockReturnValue(null); */
   });
 
   afterEach(() => {
     window.fetch.mockRestore();
-    AppointmentFormExports.AppointmentForm.mockRestore();
+  //  AppointmentFormExports.AppointmentForm.mockRestore();
   });
 
   it('fetches data when component is mounted', async () => {
@@ -69,7 +70,7 @@ describe('AppointmentFormLoader', () => {
     );
   });
 
-  it.only('passes props through to children', async () => {
+  it('passes props through to children', async () => {
     await renderAndWait(<AppointmentFormLoader testProp={123} />);
   
     expect(
