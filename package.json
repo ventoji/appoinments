@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "dev-server": "webpack-dev-server",
-    "test": "jest test/App.test.js --verbose --watchAll"
+    "test": "jest test/sagas/queryCustomer.test.js --verbose --watchAll"
   },
   "keywords": [],
   "author": "",
@@ -16,18 +16,22 @@
     "@babel/preset-env": "^7.9.0",
     "@babel/preset-react": "^7.9.4",
     "babel-loader": "^8.1.0",
+    "babel-plugin-relay": "^9.0.0",
     "expect-redux": "^5.0.3",
     "jest": "^25.2.7",
     "react-test-renderer": "^16.13.1",
+    "relay-compiler": "^9.0.0",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",
+    "graphql": "^15.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
+    "react-relay": "^9.0.0",
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.5",
     "redux-saga": "^1.1.3",
